@@ -24,9 +24,9 @@ COUNTRY_MAP = {
     "china": ["china", "chinese", "peoples republic"],
     "japan": ["japan", "japanese"],
     "netherlands": ["netherlands", "dutch", "holland"],
-    "hong kong": ["hong kong", "hk"],
+    "hong kong": ["hong-kong", "hong kong", "hk", "india-hong-kong"],
     "malaysia": ["malaysia", "malaysian"],
-    "new zealand": ["new zealand", "nz"],
+    "new zealand": ["new-zealand", "new zealand", "nz"],
     "france": ["france", "french"],
     "switzerland": ["switzerland", "swiss"],
     "sweden": ["sweden", "swedish"],
@@ -137,7 +137,13 @@ def get_treaty_text_for_country(country_name, max_chars=8000):
             continue
 
         keywords = COUNTRY_MAP.get(country_lower, [country_lower])
-        score = sum(1 for kw in keywords if kw in fname_lower)
+        country_score = sum(1 for kw in keywords if kw in fname_lower)
+
+        # MUST match at least one country keyword — prevents wrong country files
+        if country_score == 0:
+            continue
+
+        score = country_score
 
         # Prefer synthesised MLI text first, then comprehensive
         if "synthes" in fname_lower:
