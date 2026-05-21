@@ -140,7 +140,7 @@ with st.sidebar:
 
     # Treaties status
     st.markdown("#### 📂 Treaty Library")
-    treaties_path = Path(r"C:\DTAA\treaties")
+    treaties_path = Path(__file__).parent / "treaties"
     if treaties_path.exists():
         pdfs = list(treaties_path.glob("*.pdf"))
         st.success(f"✅ {len(pdfs)} treaty PDFs loaded")
@@ -150,8 +150,8 @@ with st.sidebar:
                     st.caption(f"📄 {pdf.name[:50]}")
     else:
         st.error("❌ Treaties folder not found")
-        st.caption(f"Expected: C:\\DTAA\\treaties\\")
-        st.info("Create folder and add treaty PDFs")
+        st.caption("Expected: treaties/ folder in project root")
+        st.info("Create treaties/ folder in your repo and add treaty PDFs")
 
     st.markdown("---")
     st.markdown("#### ℹ️ About")
@@ -166,7 +166,7 @@ with col1:
     st.markdown('<div class="metric-card"><h3>90+</h3><p>Indian DTAAs</p></div>',
                 unsafe_allow_html=True)
 with col2:
-    treaties_path = Path(r"C:\DTAA\treaties")
+    treaties_path = Path(__file__).parent / "treaties"
     count = len(list(treaties_path.glob("*.pdf"))) if treaties_path.exists() else 0
     st.markdown(f'<div class="metric-card"><h3>{count}</h3><p>PDFs Loaded</p></div>',
                 unsafe_allow_html=True)
@@ -620,19 +620,19 @@ with tab4:
 # ════════════════════════════════════════════════════════════════════════════
 with tab5:
     st.markdown("### 📚 Treaty Text Search")
-    st.caption("Search and view actual CBDT treaty text from your local PDF library.")
+    st.caption("Search and view actual CBDT treaty text from the treaty library.")
 
-    treaties_path = Path(r"C:\DTAA\treaties")
+    treaties_path = Path(__file__).parent / "treaties"
 
     if not treaties_path.exists():
-        st.error("❌ Treaties folder not found at C:\\DTAA\\treaties\\")
-        st.info("Create the folder and add your treaty PDFs downloaded from incometax.gov.in")
+        st.error("❌ Treaties folder not found")
+        st.info("Add a 'treaties/' folder to your GitHub repository and commit your treaty PDFs into it.")
     else:
         pdfs = sorted([p for p in treaties_path.glob("*.pdf")
                        if "afghanistan" not in p.name.lower()])
 
         if not pdfs:
-            st.warning("No PDF files found in C:\\DTAA\\treaties\\")
+            st.warning("No PDF files found in the treaties/ folder in your repository.")
         else:
             col1, col2 = st.columns(2)
             with col1:
