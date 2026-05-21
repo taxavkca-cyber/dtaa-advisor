@@ -121,17 +121,30 @@ with st.sidebar:
     st.markdown("**Kapoor Kumar & Associates**")
     st.markdown("---")
 
-    # API Key input
-    st.markdown("#### 🔑 API Configuration")
-    api_key_input = st.text_input(
-        "Anthropic API Key",
-        value=os.getenv("ANTHROPIC_API_KEY", ""),
+    # Password-based AI access — one password per user, managed via Streamlit Secrets
+    st.markdown("#### 🔑 AI Features Access")
+    st.caption("Enter access password provided by Kapoor Kumar & Associates.")
+    access_password = st.text_input(
+        "Access Password",
+        value="",
         type="password",
-        placeholder="sk-ant-...",
-        help="Get from console.anthropic.com"
+        placeholder="Enter password...",
+        help="Contact Kapoor Kumar & Associates for access."
     )
-    if api_key_input:
-        os.environ["ANTHROPIC_API_KEY"] = api_key_input
+
+    # Load valid passwords list from Secrets
+    # In Streamlit Secrets set: PASSWORDS = ["KKUSER001", "KKUSER002", "KKUSER003"]
+    valid_passwords = st.secrets.get("PASSWORDS", [])
+
+    if access_password and access_password in valid_passwords:
+        if "ANTHROPIC_API_KEY" in st.secrets:
+            os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+        st.success("✅ Access granted")
+    elif access_password:
+        os.environ.pop("ANTHROPIC_API_KEY", None)
+        st.error("❌ Incorrect password. Contact Kapoor Kumar & Associates.")
+    else:
+        os.environ.pop("ANTHROPIC_API_KEY", None)
 
     st.markdown("---")
 
@@ -282,11 +295,7 @@ with tab1:
 
         # AI Rate Analysis button
         if st.button(f"🤖 Get AI Rate Analysis for {selected_country}", type="primary"):
-            if not os.getenv("ANTHROPIC_API_KEY") or \
-               os.getenv("ANTHROPIC_API_KEY") == "sk-ant-your-key-here":
-                st.error("Please enter your Anthropic API key in the sidebar first.")
-            else:
-                with st.spinner(f"Analysing India-{selected_country} DTAA rates..."):
+            with st.spinner(f"Analysing India-{selected_country} DTAA rates..."):
                     try:
                         from advisor import generate_rate_comparison
                         result = generate_rate_comparison(selected_country)
@@ -382,9 +391,8 @@ with tab2:
     if st.button("🤖 Generate DTAA Advisory", type="primary", key="gen_advisory"):
         if not adv_details.strip():
             st.warning("Please describe the transaction details.")
-        elif not os.getenv("ANTHROPIC_API_KEY") or \
-             os.getenv("ANTHROPIC_API_KEY") == "sk-ant-your-key-here":
-            st.error("Please enter your Anthropic API key in the sidebar first.")
+        elif not os.getenv("ANTHROPIC_API_KEY"):
+            st.warning("🔑 Please enter your access password in the sidebar to use AI Advisory.")
         else:
             income_map = {
                 "Royalty / Software Licence": "royalty",
@@ -420,7 +428,6 @@ with tab2:
                     )
                 except Exception as e:
                     st.error(f"Error generating advisory: {str(e)}")
-                    st.info("Check your API key in the sidebar.")
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -526,11 +533,7 @@ with tab3:
     st.info(f"📌 {note}")
 
     if st.button("🤖 Get Detailed AI Classification", key="classify_btn"):
-        if not os.getenv("ANTHROPIC_API_KEY") or \
-           os.getenv("ANTHROPIC_API_KEY") == "sk-ant-your-key-here":
-            st.error("Please enter your Anthropic API key in the sidebar.")
-        else:
-            with st.spinner("Generating detailed classification..."):
+        with st.spinner("Generating detailed classification..."):
                 try:
                     from advisor import classify_form_145
                     result = classify_form_145(f_payment, f_amount, f_taxable, f_dtaa)
@@ -589,9 +592,8 @@ with tab4:
     if st.button("📝 Draft Notice Reply", type="primary", key="draft_notice"):
         if not n_facts.strip():
             st.warning("Please describe the facts of the case.")
-        elif not os.getenv("ANTHROPIC_API_KEY") or \
-             os.getenv("ANTHROPIC_API_KEY") == "sk-ant-your-key-here":
-            st.error("Please enter your Anthropic API key in the sidebar.")
+        elif not os.getenv("ANTHROPIC_API_KEY"):
+            st.warning("🔑 Please enter your access password in the sidebar to use this feature.")
         else:
             with st.spinner("Drafting formal reply (30-40 seconds)..."):
                 try:
@@ -644,31 +646,34 @@ with tab5:
                 )
 
             if st.button("🔍 Search Treaty", key="search_treaty"):
-                selected_path = treaties_path / selected_pdf
-                with st.spinner("Reading PDF..."):
-                    try:
-                        from treaty_reader import (extract_text_from_pdf,
-                                                    find_relevant_sections)
-                        text = extract_text_from_pdf(selected_path, max_pages=30)
+                if not os.getenv("ANTHROPIC_API_KEY"):
+                    st.warning("🔑 Please enter your access password in the sidebar to use Treaty Search.")
+                else:
+                    selected_path = treaties_path / selected_pdf
+                    with st.spinner("Reading PDF..."):
+                        try:
+                            from treaty_reader import (extract_text_from_pdf,
+                                                        find_relevant_sections)
+                            text = extract_text_from_pdf(selected_path, max_pages=30)
 
-                        if search_topic:
-                            relevant = find_relevant_sections(text, search_topic)
-                            if relevant:
-                                st.markdown(f"#### Results for '{search_topic}'")
-                                st.markdown(
-                                    f'<div class="output-box">{relevant}</div>',
-                                    unsafe_allow_html=True
-                                )
+                            if search_topic:
+                                relevant = find_relevant_sections(text, search_topic)
+                                if relevant:
+                                    st.markdown(f"#### Results for '{search_topic}'")
+                                    st.markdown(
+                                        f'<div class="output-box">{relevant}</div>',
+                                        unsafe_allow_html=True
+                                    )
+                                else:
+                                    st.info(f"No specific results for '{search_topic}'. "
+                                            f"Showing first 2000 characters.")
+                                    st.text(text[:2000])
                             else:
-                                st.info(f"No specific results for '{search_topic}'. "
-                                        f"Showing first 2000 characters.")
-                                st.text(text[:2000])
-                        else:
-                            st.markdown("#### Treaty Text (first 3000 characters)")
-                            st.text(text[:3000])
+                                st.markdown("#### Treaty Text (first 3000 characters)")
+                                st.text(text[:3000])
 
-                    except Exception as e:
-                        st.error(f"Error reading PDF: {str(e)}")
+                        except Exception as e:
+                            st.error(f"Error reading PDF: {str(e)}")
 
             # Show PDF info
             st.markdown("#### Available Treaties")
