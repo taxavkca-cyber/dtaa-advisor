@@ -9,9 +9,6 @@ import streamlit as st
 import pandas as pd
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Page configuration
 st.set_page_config(
