@@ -225,8 +225,8 @@ with tab1:
         "MLI": ["No", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes",
                  "Yes", "Yes", "Yes", "No", "Yes", "Partial", "Yes",
                  "No", "No", "No", "Yes"],
-        "GAAR Risk": ["HIGH", "MEDIUM", "MEDIUM", "MEDIUM", "HIGH", "MEDIUM",
-                       "LOW", "MEDIUM", "MEDIUM", "HIGH", "MEDIUM", "MEDIUM",
+        "GAAR Risk": ["LOW", "MEDIUM", "MEDIUM", "MEDIUM", "HIGH", "MEDIUM",
+                       "LOW", "MEDIUM", "MEDIUM", "MEDIUM", "MEDIUM", "MEDIUM",
                        "LOW", "MEDIUM", "MEDIUM", "LOW", "LOW", "LOW",
                        "LOW", "MEDIUM"],
     }
