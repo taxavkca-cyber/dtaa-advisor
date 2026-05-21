@@ -5,10 +5,7 @@ Generates structured DTAA advisory using Claude API + Treaty PDFs
 
 import anthropic
 import os
-from dotenv import load_dotenv
 from treaty_reader import get_treaty_text_for_country, search_treaty_for_topic
-
-load_dotenv()
 
 # ITA 2025 domestic rates reference
 DOMESTIC_RATES = {
@@ -22,6 +19,15 @@ DOMESTIC_RATES = {
 
 SYSTEM_PROMPT = """You are DTAA Advisor, an expert AI assistant for Indian Chartered Accountants.
 You operate exclusively under the Income Tax Act, 2025 (ITA 2025) and Income Tax Rules, 2026.
+
+CRITICAL — DETERMINE PAYMENT DIRECTION FIRST:
+Before any analysis, identify:
+- WHO is paying? (Indian entity or Foreign entity)
+- WHO is receiving? (Indian entity or Foreign entity)
+- Is this OUTBOUND (India paying to NR) → Form 145/146 applies
+- Is this INBOUND (NR paying to India) → Form 145/146 does NOT apply; FTC under Section 91 applies
+State the direction explicitly in section (b) Facts before proceeding.
+NEVER assume outbound if facts indicate inbound.
 
 CRITICAL ITA 2025 RULES — NEVER VIOLATE:
 
@@ -69,8 +75,8 @@ Source: India-[Country] DTAA | ITA 2025 Section [X] | Rule 220 IT Rules 2026"""
 def get_claude_client():
     """Initialize Anthropic client"""
     api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key or api_key == "sk-ant-your-key-here":
-        raise ValueError("Please add your Anthropic API key to the .env file")
+    if not api_key:
+        raise ValueError("API key not found. Please enter your access password in the sidebar.")
     return anthropic.Anthropic(api_key=api_key)
 
 
@@ -112,7 +118,7 @@ Always mention Form 41, Form 145 Part, and Form 146 requirements.
 """
     response = client.messages.create(
         model="claude-opus-4-5",
-        max_tokens=2000,
+        max_tokens=4000,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}]
     )
@@ -160,7 +166,7 @@ Be formal and submission-ready.
 """
     response = client.messages.create(
         model="claude-opus-4-5",
-        max_tokens=2500,
+        max_tokens=4000,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}]
     )
