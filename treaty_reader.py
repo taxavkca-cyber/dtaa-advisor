@@ -122,15 +122,29 @@ def get_treaty_text_for_country(country_name, max_chars=8000):
     best_file = None
     best_score = 0
 
+    # Files to exclude — these are not DTAA treaties
+    exclude_keywords = [
+        "intergovernmental", "fatca", "iga", "country-by-country",
+        "countrybycount", "cbc", "cbcr", "exchange-of-information",
+        "tiea", "administrative"
+    ]
+
     for pdf_file in folder.glob("*.pdf"):
         fname_lower = pdf_file.name.lower()
+
+        # Skip non-DTAA files
+        if any(excl in fname_lower for excl in exclude_keywords):
+            continue
+
         keywords = COUNTRY_MAP.get(country_lower, [country_lower])
         score = sum(1 for kw in keywords if kw in fname_lower)
 
-        # Prefer synthesised text (MLI modified) over comprehensive
+        # Prefer synthesised MLI text first, then comprehensive
         if "synthes" in fname_lower:
-            score += 2
+            score += 3
         if "comprehensive" in fname_lower:
+            score += 2
+        if "dtaa" in fname_lower or "agreement" in fname_lower:
             score += 1
 
         if score > best_score:
