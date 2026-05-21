@@ -192,7 +192,7 @@ Also state: MLI status, GAAR risk level, Form 41 requirement.
 """
     response = client.messages.create(
         model="claude-opus-4-5",
-        max_tokens=1000,
+        max_tokens=3000,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}]
     )
