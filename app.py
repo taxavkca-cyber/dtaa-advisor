@@ -166,13 +166,13 @@ with st.sidebar:
     st.markdown("#### ℹ️ About")
     st.caption("AICA Level 2 Capstone Project")
     st.caption("May 2026")
-    st.caption("90+ Indian DTAAs covered")
+    st.caption("25 Indian DTAAs covered")
 
 
 # ── STATS ROW ─────────────────────────────────────────────────────────────
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.markdown('<div class="metric-card"><h3>90+</h3><p>Indian DTAAs</p></div>',
+    st.markdown('<div class="metric-card"><h3>25</h3><p>Indian DTAAs</p></div>',
                 unsafe_allow_html=True)
 with col2:
     treaties_path = Path(__file__).parent / "treaties"
