@@ -180,7 +180,7 @@ with col2:
     st.markdown(f'<div class="metric-card"><h3>{count}</h3><p>PDFs Loaded</p></div>',
                 unsafe_allow_html=True)
 with col3:
-    st.markdown('<div class="metric-card"><h3>4</h3><p>Core Modules</p></div>',
+    st.markdown('<div class="metric-card"><h3>5</h3><p>Core Modules</p></div>',
                 unsafe_allow_html=True)
 with col4:
     st.markdown('<div class="metric-card"><h3>&lt;10m</h3><p>Per Advisory</p></div>',
