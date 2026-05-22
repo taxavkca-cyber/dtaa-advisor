@@ -2,7 +2,7 @@
 DTAA Advisor - Main Streamlit Application
 AI-Powered Double Tax Treaty Advisory Suite for Chartered Accountants
 Built under Income Tax Act, 2025 | Income Tax Rules, 2026
-Kapoor Kumar and Associates | AICA Level 2 Capstone 2026
+CA Vaishali Kapoor | AICA Level 2 Capstone 2026
 """
 
 import streamlit as st
@@ -12,7 +12,7 @@ from pathlib import Path
 
 # Page configuration
 st.set_page_config(
-    page_title="DTAA Advisor — Kapoor Kumar & Associates",
+    page_title="DTAA Advisor — CA Vaishali Kapoor",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -97,7 +97,7 @@ st.markdown("""
 <div class="main-header">
     <h1>⚖️ DTAA Advisor</h1>
     <p>AI-Powered Double Tax Treaty Advisory Suite &nbsp;|&nbsp;
-       Kapoor Kumar & Associates &nbsp;|&nbsp;
+       CA Vaishali Kapoor &nbsp;|&nbsp;
        Built under Income Tax Act, 2025 &nbsp;|&nbsp;
        Income Tax Rules, 2026</p>
 </div>
@@ -118,18 +118,18 @@ Rule 220(3) exempt list — 33 categories
 # ── SIDEBAR ───────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### ⚖️ DTAA Advisor")
-    st.markdown("**Kapoor Kumar & Associates**")
+    st.markdown("**CA Vaishali Kapoor**")
     st.markdown("---")
 
     # Password-based AI access — one password per user, managed via Streamlit Secrets
     st.markdown("#### 🔑 AI Features Access")
-    st.caption("Enter access password provided by Kapoor Kumar & Associates.")
+    st.caption("Enter access password provided by CA Vaishali Kapoor.")
     access_password = st.text_input(
         "Access Password",
         value="",
         type="password",
         placeholder="Enter password...",
-        help="Contact Kapoor Kumar & Associates for access."
+        help="Contact CA Vaishali Kapoor for access."
     )
 
     # Load valid passwords list from Secrets
@@ -142,7 +142,7 @@ with st.sidebar:
         st.success("✅ Access granted")
     elif access_password:
         os.environ.pop("ANTHROPIC_API_KEY", None)
-        st.error("❌ Incorrect password. Contact Kapoor Kumar & Associates.")
+        st.error("❌ Incorrect password. Contact CA Vaishali Kapoor.")
     else:
         os.environ.pop("ANTHROPIC_API_KEY", None)
 
@@ -359,34 +359,6 @@ with tab2:
     )
 
     # Demo scenarios
-    with st.expander("📌 Load Demo Scenario"):
-        demo = st.radio("Select scenario:", [
-            "Scenario 1: Software Licence Fee — India to USA",
-            "Scenario 2: Dividend to NRI in UAE",
-            "Scenario 3: FTS Payment — India to Singapore"
-        ])
-        if st.button("Load Scenario"):
-            scenarios = {
-                "Scenario 1: Software Licence Fee — India to USA": {
-                    "country": "USA", "income": "Royalty / Software Licence",
-                    "details": "Indian IT company paying annual software licence fee of Rs. 25 lakhs "
-                               "to US-based software company. Standard EULA — no copyright rights transferred. "
-                               "US company has no PE in India."
-                },
-                "Scenario 2: Dividend to NRI in UAE": {
-                    "country": "UAE", "income": "Dividend",
-                    "details": "Indian listed company paying dividend of Rs. 3 lakhs to UAE resident NRI "
-                               "holding 5% shares. TRC available from UAE Federal Tax Authority."
-                },
-                "Scenario 3: FTS Payment — India to Singapore": {
-                    "country": "Singapore", "income": "Fees for Technical Services (FTS)",
-                    "details": "Indian company paid management consultancy fees of Rs. 25 lakhs to "
-                               "Singapore entity. Services involved general business advisory — "
-                               "no technical knowledge transferred to Indian company."
-                }
-            }
-            st.session_state["demo_loaded"] = scenarios[demo]
-            st.success(f"Scenario loaded! Scroll down and click Generate Advisory.")
 
     if st.button("🤖 Generate DTAA Advisory", type="primary", key="gen_advisory"):
         if not adv_details.strip():
@@ -693,7 +665,7 @@ with tab5:
 st.markdown("---")
 st.markdown("""
 <div style="text-align:center; color:#888; font-size:0.8rem;">
-DTAA Advisor — Kapoor Kumar & Associates &nbsp;|&nbsp;
+DTAA Advisor — CA Vaishali Kapoor &nbsp;|&nbsp;
 AICA Level 2 Capstone 2026 &nbsp;|&nbsp;
 Built under Income Tax Act, 2025 | Income Tax Rules, 2026 &nbsp;|&nbsp;
 Form 145 | Form 146 | Form 41 | Section 393<br>
