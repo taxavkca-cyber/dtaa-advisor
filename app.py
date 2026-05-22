@@ -12,7 +12,7 @@ from pathlib import Path
 
 # Page configuration
 st.set_page_config(
-    page_title="DTAA Advisor — CA Vaishali Kapoor",
+    page_title="DTAA Advisor",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -97,7 +97,6 @@ st.markdown("""
 <div class="main-header">
     <h1>⚖️ DTAA Advisor</h1>
     <p>AI-Powered Double Tax Treaty Advisory Suite &nbsp;|&nbsp;
-       CA Vaishali Kapoor &nbsp;|&nbsp;
        Built under Income Tax Act, 2025 &nbsp;|&nbsp;
        Income Tax Rules, 2026</p>
 </div>
@@ -118,7 +117,7 @@ Rule 220(3) exempt list — 33 categories
 # ── SIDEBAR ───────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("### ⚖️ DTAA Advisor")
-    st.markdown("**CA Vaishali Kapoor**")
+    st.markdown("**DTAA Advisor**")
     st.markdown("---")
 
     # Password-based AI access — one password per user, managed via Streamlit Secrets
