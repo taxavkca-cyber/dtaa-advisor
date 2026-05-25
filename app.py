@@ -329,10 +329,7 @@ with tab1:
                         from advisor import generate_rate_comparison
                         result = generate_rate_comparison(selected_country)
                         st.markdown("#### AI Rate Analysis")
-                        st.markdown(
-                            f'<div class="output-box">{result}</div>',
-                            unsafe_allow_html=True
-                        )
+                        st.markdown(result)
                     except Exception as e:
                         st.error(f"Error: {str(e)}")
 
@@ -417,10 +414,7 @@ with tab2:
                         full_details, use_treaty_pdf
                     )
                     st.markdown("#### Advisory Output")
-                    st.markdown(
-                        f'<div class="output-box">{result}</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(result)
                     st.download_button(
                         "📥 Download Advisory as Text",
                         data=result,
@@ -538,10 +532,7 @@ with tab3:
                 try:
                     from advisor import classify_form_145
                     result = classify_form_145(f_payment, f_amount, f_taxable, f_dtaa)
-                    st.markdown(
-                        f'<div class="output-box">{result}</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(result)
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
 
@@ -601,10 +592,7 @@ with tab4:
                     from advisor import generate_notice_reply
                     result = generate_notice_reply(n_type, n_country, n_facts, n_article)
                     st.markdown("#### Draft Notice Reply")
-                    st.markdown(
-                        f'<div class="output-box">{result}</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.markdown(result)
                     st.download_button(
                         "📥 Download Reply as Text",
                         data=result,
@@ -661,10 +649,7 @@ with tab5:
                                 relevant = find_relevant_sections(text, search_topic)
                                 if relevant:
                                     st.markdown(f"#### Results for '{search_topic}'")
-                                    st.markdown(
-                                        f'<div class="output-box">{relevant}</div>',
-                                        unsafe_allow_html=True
-                                    )
+                                    st.markdown(relevant)
                                 else:
                                     st.info(f"No specific results for '{search_topic}'. "
                                             f"Showing first 2000 characters.")
