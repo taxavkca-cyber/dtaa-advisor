@@ -9,7 +9,7 @@ import PyPDF2
 from pathlib import Path
 
 
-TREATIES_FOLDER = Path(__file__).parent / "treaties"
+TREATIES_FOLDER = r"C:\DTAA\treaties"
 
 # Country name mapping for smart detection
 COUNTRY_MAP = {
@@ -24,9 +24,9 @@ COUNTRY_MAP = {
     "china": ["china", "chinese", "peoples republic"],
     "japan": ["japan", "japanese"],
     "netherlands": ["netherlands", "dutch", "holland"],
-    "hong kong": ["hong-kong", "hong kong", "hk", "india-hong-kong"],
+    "hong kong": ["hong kong", "hk"],
     "malaysia": ["malaysia", "malaysian"],
-    "new zealand": ["new-zealand", "new zealand", "nz"],
+    "new zealand": ["new zealand", "nz"],
     "france": ["france", "french"],
     "switzerland": ["switzerland", "swiss"],
     "sweden": ["sweden", "swedish"],
@@ -46,7 +46,7 @@ COUNTRY_MAP = {
 
 def get_available_treaties():
     """Scan treaties folder and return list of available PDFs"""
-    folder = TREATIES_FOLDER
+    folder = Path(TREATIES_FOLDER)
     if not folder.exists():
         return []
     pdfs = list(folder.glob("*.pdf"))
@@ -97,24 +97,56 @@ def extract_key_articles(text):
 def find_relevant_sections(text, query_keywords):
     """Find sections of treaty text relevant to a query"""
     relevant_chunks = []
-    paragraphs = text.split("\n\n")
     query_lower = query_keywords.lower()
-    keywords = query_lower.split()
+    keywords = [kw for kw in query_lower.split() if len(kw) > 2]
 
-    for para in paragraphs:
-        para_lower = para.lower()
-        score = sum(1 for kw in keywords if kw in para_lower)
-        if score >= 2 and len(para.strip()) > 100:
-            relevant_chunks.append((score, para.strip()))
+    # Split by article boundaries first for better targeting
+    import re
+    # Try to split on ARTICLE headings
+    article_splits = re.split(r'(ARTICLE\s+\d+[A-Z]?\b[^\n]*)', text, flags=re.IGNORECASE)
+
+    # If article splitting worked, score each article section
+    if len(article_splits) > 3:
+        sections = []
+        i = 0
+        while i < len(article_splits):
+            if re.match(r'ARTICLE\s+\d+', article_splits[i], re.IGNORECASE) and i + 1 < len(article_splits):
+                header = article_splits[i].strip()
+                body = article_splits[i + 1] if i + 1 < len(article_splits) else ""
+                sections.append(header + "\n" + body)
+                i += 2
+            else:
+                i += 1
+
+        for section in sections:
+            section_lower = section.lower()
+            score = sum(2 for kw in keywords if kw in section_lower)
+            # Bonus for keyword in header/first line
+            first_line = section.split('\n')[0].lower()
+            score += sum(3 for kw in keywords if kw in first_line)
+            if score >= 2 and len(section.strip()) > 50:
+                relevant_chunks.append((score, section.strip()))
+    else:
+        # Fallback to paragraph splitting
+        paragraphs = text.split("\n\n")
+        for para in paragraphs:
+            para_lower = para.lower()
+            score = sum(1 for kw in keywords if kw in para_lower)
+            if score >= 2 and len(para.strip()) > 100:
+                relevant_chunks.append((score, para.strip()))
 
     relevant_chunks.sort(key=lambda x: x[0], reverse=True)
     top_chunks = [chunk for _, chunk in relevant_chunks[:5]]
-    return "\n\n---\n\n".join(top_chunks)
+
+    if not top_chunks:
+        return ""
+
+    return "\n\n" + "─"*60 + "\n\n".join(top_chunks)
 
 
 def get_treaty_text_for_country(country_name, max_chars=8000):
     """Get treaty text for a specific country"""
-    folder = TREATIES_FOLDER
+    folder = Path(TREATIES_FOLDER)
     if not folder.exists():
         return None, f"Treaties folder not found: {TREATIES_FOLDER}"
 
@@ -122,35 +154,15 @@ def get_treaty_text_for_country(country_name, max_chars=8000):
     best_file = None
     best_score = 0
 
-    # Files to exclude — these are not DTAA treaties
-    exclude_keywords = [
-        "intergovernmental", "fatca", "iga", "country-by-country",
-        "countrybycount", "cbc", "cbcr", "exchange-of-information",
-        "tiea", "administrative"
-    ]
-
     for pdf_file in folder.glob("*.pdf"):
         fname_lower = pdf_file.name.lower()
-
-        # Skip non-DTAA files
-        if any(excl in fname_lower for excl in exclude_keywords):
-            continue
-
         keywords = COUNTRY_MAP.get(country_lower, [country_lower])
-        country_score = sum(1 for kw in keywords if kw in fname_lower)
+        score = sum(1 for kw in keywords if kw in fname_lower)
 
-        # MUST match at least one country keyword — prevents wrong country files
-        if country_score == 0:
-            continue
-
-        score = country_score
-
-        # Prefer synthesised MLI text first, then comprehensive
+        # Prefer synthesised text (MLI modified) over comprehensive
         if "synthes" in fname_lower:
-            score += 3
-        if "comprehensive" in fname_lower:
             score += 2
-        if "dtaa" in fname_lower or "agreement" in fname_lower:
+        if "comprehensive" in fname_lower:
             score += 1
 
         if score > best_score:
