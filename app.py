@@ -660,7 +660,7 @@ with tab5:
                     st.warning("🔑 Please enter your access password in the sidebar to use Treaty Search.")
                 else:
                     selected_path = treaties_path / selected_pdf
-                    with st.spinner("Reading PDF..."):
+                    with st.spinner("Reading PDF and finding relevant sections..."):
                         try:
                             from treaty_reader import (extract_text_from_pdf,
                                                         find_relevant_sections)
@@ -669,18 +669,38 @@ with tab5:
                             if search_topic:
                                 relevant = find_relevant_sections(text, search_topic)
                                 if relevant:
-                                    st.markdown(f"#### Results for '{search_topic}'")
-                                    st.markdown(
-                                        f'<div class="output-box">{relevant}</div>',
-                                        unsafe_allow_html=True
+                                    st.success(f"✅ Found relevant sections for '{search_topic}'")
+                                    st.markdown(f"#### Treaty Text — Results for '{search_topic}'")
+                                    # Clean and display in scrollable text area
+                                    clean_text = relevant.replace("---", "\n" + "─"*60 + "\n")
+                                    st.text_area(
+                                        label="Relevant Treaty Sections",
+                                        value=clean_text,
+                                        height=400,
+                                        label_visibility="collapsed"
+                                    )
+                                    st.download_button(
+                                        "📥 Download Treaty Extract",
+                                        data=clean_text,
+                                        file_name=f"Treaty_{selected_pdf[:20]}_{search_topic[:20]}.txt",
+                                        mime="text/plain"
                                     )
                                 else:
-                                    st.info(f"No specific results for '{search_topic}'. "
-                                            f"Showing first 2000 characters.")
-                                    st.text(text[:2000])
+                                    st.info(f"No specific results for '{search_topic}'. Showing first 2000 characters.")
+                                    st.text_area(
+                                        label="Treaty Text",
+                                        value=text[:2000],
+                                        height=400,
+                                        label_visibility="collapsed"
+                                    )
                             else:
                                 st.markdown("#### Treaty Text (first 3000 characters)")
-                                st.text(text[:3000])
+                                st.text_area(
+                                    label="Treaty Text",
+                                    value=text[:3000],
+                                    height=400,
+                                    label_visibility="collapsed"
+                                )
 
                         except Exception as e:
                             st.error(f"Error reading PDF: {str(e)}")
