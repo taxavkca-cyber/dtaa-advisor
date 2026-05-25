@@ -664,7 +664,7 @@ with tab5:
                         try:
                             from treaty_reader import (extract_text_from_pdf,
                                                         find_relevant_sections)
-                            text = extract_text_from_pdf(selected_path, max_pages=30)
+                            text = extract_text_from_pdf(selected_path, max_pages=80)
 
                             if search_topic:
                                 relevant = find_relevant_sections(text, search_topic)

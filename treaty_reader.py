@@ -9,7 +9,7 @@ import PyPDF2
 from pathlib import Path
 
 
-TREATIES_FOLDER = r"C:\DTAA\treaties"
+TREATIES_FOLDER = Path(__file__).parent / "treaties"
 
 # Country name mapping for smart detection
 COUNTRY_MAP = {
@@ -24,9 +24,9 @@ COUNTRY_MAP = {
     "china": ["china", "chinese", "peoples republic"],
     "japan": ["japan", "japanese"],
     "netherlands": ["netherlands", "dutch", "holland"],
-    "hong kong": ["hong kong", "hk"],
+    "hong kong": ["hong-kong", "hong kong", "hk", "india-hong-kong"],
     "malaysia": ["malaysia", "malaysian"],
-    "new zealand": ["new zealand", "nz"],
+    "new zealand": ["new-zealand", "new zealand", "nz"],
     "france": ["france", "french"],
     "switzerland": ["switzerland", "swiss"],
     "sweden": ["sweden", "swedish"],
@@ -46,7 +46,7 @@ COUNTRY_MAP = {
 
 def get_available_treaties():
     """Scan treaties folder and return list of available PDFs"""
-    folder = Path(TREATIES_FOLDER)
+    folder = TREATIES_FOLDER
     if not folder.exists():
         return []
     pdfs = list(folder.glob("*.pdf"))
@@ -146,7 +146,7 @@ def find_relevant_sections(text, query_keywords):
 
 def get_treaty_text_for_country(country_name, max_chars=8000):
     """Get treaty text for a specific country"""
-    folder = Path(TREATIES_FOLDER)
+    folder = TREATIES_FOLDER
     if not folder.exists():
         return None, f"Treaties folder not found: {TREATIES_FOLDER}"
 
