@@ -221,6 +221,11 @@ with tab1:
                            10, 10, 10, 10, 10, 10, 10, 10, 15, 20],
         "FTS DTAA%": [15, 15, "N/A", 10, "N/A", 10, 10, 15, 10, 10,
                        10, 10, 10, 10, 10, "N/A", 10, 10, 15, 20],
+        "Cap Gains DTAA%": ["Domestic", "Domestic", "Exempt", "Domestic",
+                             "Domestic*", "Domestic", "Domestic", "Domestic",
+                             "Domestic", "Domestic", "Domestic", "Domestic",
+                             "Exempt", "Exempt", "Domestic", "Domestic",
+                             "Domestic", "Domestic", "Domestic", "Domestic"],
         "MLI": ["No", "Yes", "Yes", "Yes", "Yes", "Yes", "No", "Yes", "Yes",
                  "Yes", "Yes", "Yes", "No", "Yes", "Partial", "Yes",
                  "No", "No", "No", "Yes"],
@@ -240,7 +245,7 @@ with tab1:
         )
         income_filter = st.selectbox(
             "Income Type",
-            ["All", "Dividend", "Interest", "Royalty", "FTS"]
+            ["All", "Dividend", "Interest", "Royalty", "FTS", "Capital Gains"]
         )
 
     with col_b:
@@ -251,7 +256,8 @@ with tab1:
         Dividend: 20% + SC + Cess &nbsp;|&nbsp;
         Interest: 20% + SC + Cess &nbsp;|&nbsp;
         Royalty: 10% + SC + Cess &nbsp;|&nbsp;
-        FTS: 10% + SC + Cess
+        FTS: 10% + SC + Cess &nbsp;|&nbsp;
+        Capital Gains: 12.5% (LTCG Sec 112A) / 20% (STCG)
         </div>
         """, unsafe_allow_html=True)
 
@@ -263,11 +269,32 @@ with tab1:
             </div>
             """, unsafe_allow_html=True)
 
+        if selected_country == "Mauritius" and income_filter in ["Capital Gains", "All"]:
+            st.markdown("""
+            <div class="warning-box">
+            ⚠️ <b>Mauritius Capital Gains:</b> Post-2016 Protocol — shares acquired after 1 April 2017
+            taxable at full domestic rate (12.5% LTCG). Grandfathering only for pre-April 2017 acquisitions.
+            HIGH GAAR risk — substance in Mauritius must be demonstrated.
+            </div>
+            """, unsafe_allow_html=True)
+
     # Display table
     if selected_country != "All Countries":
         display_df = df[df["Country"] == selected_country]
     else:
         display_df = df
+
+    # Filter columns based on income type
+    if income_filter == "Dividend":
+        display_df = display_df[["Country", "Dividend DTAA%", "MLI", "GAAR Risk"]]
+    elif income_filter == "Interest":
+        display_df = display_df[["Country", "Interest DTAA%", "MLI", "GAAR Risk"]]
+    elif income_filter == "Royalty":
+        display_df = display_df[["Country", "Royalty DTAA%", "MLI", "GAAR Risk"]]
+    elif income_filter == "FTS":
+        display_df = display_df[["Country", "FTS DTAA%", "MLI", "GAAR Risk"]]
+    elif income_filter == "Capital Gains":
+        display_df = display_df[["Country", "Cap Gains DTAA%", "MLI", "GAAR Risk"]]
 
     # Color code GAAR risk
     def color_gaar(val):
@@ -276,7 +303,10 @@ with tab1:
                   "LOW": "background-color: #E2EFDA; color: #375623"}
         return colors.get(val, "")
 
-    styled_df = display_df.style.map(color_gaar, subset=["GAAR Risk"])
+    if "GAAR Risk" in display_df.columns:
+        styled_df = display_df.style.map(color_gaar, subset=["GAAR Risk"])
+    else:
+        styled_df = display_df.style
     st.dataframe(styled_df, use_container_width=True, hide_index=True)
 
     if selected_country != "All Countries":
