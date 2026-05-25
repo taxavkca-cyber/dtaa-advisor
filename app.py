@@ -72,6 +72,21 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+# ── MARKDOWN STRIPPER — for clean plain text downloads ───────────────────────
+def strip_markdown(text):
+    import re
+    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
+    text = re.sub(r'^---+$', '─' * 60, text, flags=re.MULTILINE)
+    text = re.sub(r'^\|[-| :]+\|$', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^\|(.+)\|$', lambda m: '  '.join(
+        c.strip() for c in m.group(1).split('|') if c.strip()
+    ), text, flags=re.MULTILINE)
+    text = re.sub(r'`{1,3}', '', text)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
+
+
 # ── IMPORTS (lazy to handle missing packages gracefully) ──────────────────
 def import_modules():
     try:
@@ -329,7 +344,10 @@ with tab1:
                         from advisor import generate_rate_comparison
                         result = generate_rate_comparison(selected_country)
                         st.markdown("#### AI Rate Analysis")
-                        st.markdown(result)
+                        st.markdown(
+                            f'<div class="output-box">{result}</div>',
+                            unsafe_allow_html=True
+                        )
                     except Exception as e:
                         st.error(f"Error: {str(e)}")
 
@@ -417,7 +435,7 @@ with tab2:
                     st.markdown(result)
                     st.download_button(
                         "📥 Download Advisory as Text",
-                        data=result,
+                        data=strip_markdown(result),
                         file_name=f"DTAA_Advisory_{adv_country}_{income_type}.txt",
                         mime="text/plain"
                     )
@@ -532,7 +550,10 @@ with tab3:
                 try:
                     from advisor import classify_form_145
                     result = classify_form_145(f_payment, f_amount, f_taxable, f_dtaa)
-                    st.markdown(result)
+                    st.markdown(
+                        f'<div class="output-box">{result}</div>',
+                        unsafe_allow_html=True
+                    )
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
 
@@ -595,7 +616,7 @@ with tab4:
                     st.markdown(result)
                     st.download_button(
                         "📥 Download Reply as Text",
-                        data=result,
+                        data=strip_markdown(result),
                         file_name=f"Notice_Reply_{n_country}_{n_type[:20]}.txt",
                         mime="text/plain"
                     )
@@ -649,7 +670,10 @@ with tab5:
                                 relevant = find_relevant_sections(text, search_topic)
                                 if relevant:
                                     st.markdown(f"#### Results for '{search_topic}'")
-                                    st.markdown(relevant)
+                                    st.markdown(
+                                        f'<div class="output-box">{relevant}</div>',
+                                        unsafe_allow_html=True
+                                    )
                                 else:
                                     st.info(f"No specific results for '{search_topic}'. "
                                             f"Showing first 2000 characters.")
